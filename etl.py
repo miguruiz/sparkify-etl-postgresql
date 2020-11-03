@@ -1,10 +1,18 @@
 import os
+import io
 import glob
 import psycopg2
 import pandas as pd
 from sql_queries import *
 
-
+def create_insert_statements(cur, conn):
+    """
+    Creates each prepared insert statement 
+    """
+    for query in prepared_statements:
+        cur.execute(query)
+        conn.commit()
+        
 def process_song_file(cur, filepath):
     # open song file
     df = pd.read_json(filepath, lines = True)
@@ -40,15 +48,21 @@ def process_log_file(cur, filepath):
     
     time_df = t
 
-    for i, row in time_df.iterrows():
-        cur.execute(time_table_insert, list(row))
+    # text buffer
+    s_buf = io.StringIO()
+    time_df.to_csv(s_buf)
+
+    # insert into time table
+    cur.copy_from(s_buf,time_table_insert)
 
     # load user table
     user_df = df[['userId',"firstName", "lastName", "gender", "level"]].drop_duplicates(subset='userId')
     
-    # insert user records
-    for i, row in user_df.iterrows():
-        cur.execute(user_table_insert, row)
+    # text buffer
+    user_df.to_csv(s_buf)
+    
+    # insert into time table
+    cur.copy_from(s_buf,user_table_insert)
 
     # insert songplay records
     for index, row in df.iterrows():
@@ -90,6 +104,7 @@ def main():
     conn = psycopg2.connect("host=127.0.0.1 dbname=sparkifydb user=student password=student")
     cur = conn.cursor()
 
+    create_insert_statements(cur,conn)    
     process_data(cur, conn, filepath='data/song_data', func=process_song_file)
     process_data(cur, conn, filepath='data/log_data', func=process_log_file)
 

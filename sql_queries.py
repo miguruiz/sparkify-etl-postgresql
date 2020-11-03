@@ -1,7 +1,4 @@
 # PENDING:
-    # Categorical data
-    # SERIAL IDs
-    # on conflict
     # PREPARED STATEMENTS FOR THE INSERTS
 
 
@@ -72,28 +69,36 @@ CREATE TABLE IF NOT EXISTS time (
 )
 """)
 
+# PREPARED STATEMENTS
+songplays_statement = ("""
+    PREPARE songplays_statement (TIMESTAMP, INT, VARCHAR, VARCHAR, VARCHAR, INT, VARCHAR, VARCHAR) AS
+    INSERT INTO songplays (start_time,user_id, level, song_id, artist_id, session_id, location, user_agent ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+""")
+
+song_statement = ("""
+    PREPARE song_statement (VARCHAR, VARCHAR, VARCHAR, INT, INT) AS
+    INSERT INTO songs VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING;
+""")
+
+artist_statement = ("""
+    PREPARE artist_statement (VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR) AS
+    INSERT INTO artists VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING;
+""")
+
+
 # INSERT RECORDS
+songplay_table_insert = ("EXECUTE songplays_statement (%s, %s, %s, %s, %s, %s, %s, %s);")
 
-songplay_table_insert = ("""
-INSERT INTO songplays (start_time,user_id, level, song_id, artist_id, session_id, location, user_agent ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-""")
-
-user_table_insert = ("""
-INSERT INTO users VALUES (%s, %s, %s, %s, %s) ON CONFLICT DO NOTHING;
-""")
+user_table_insert = "users"
     
-song_table_insert = ("""
-INSERT INTO songs VALUES (%s, %s, %s, %s, %s)ON CONFLICT DO NOTHING;
-""")
+song_table_insert = ("EXECUTE song_statement (%s, %s, %s, %s, %s);")
 
-artist_table_insert = ("""
-INSERT INTO artists VALUES (%s, %s, %s, %s, %s)ON CONFLICT DO NOTHING;
-""")
+artist_table_insert = ("EXECUTE artist_statement (%s, %s, %s, %s, %s);")
+
+time_table_insert = "time"
 
 
-time_table_insert = ("""
-INSERT INTO time VALUES (%s, %s, %s, %s, %s, %s, %s)ON CONFLICT DO NOTHING;
-""")
+
 
 # FIND SONGS
 
@@ -103,8 +108,8 @@ FROM songs s
 LEFT JOIN artists a
 ON a.artist_id = s.artist_id
 WHERE
-    s.title LIKE %s AND
-    a.name LIKE %s AND
+    s.title = %s AND
+    a.name = %s AND
     s.duration = %s
 """)
 
@@ -113,3 +118,4 @@ WHERE
 
 create_table_queries = [songplay_table_create, user_table_create, song_table_create, artist_table_create, time_table_create]
 drop_table_queries = [songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
+prepared_statements = [songplays_statement, song_statement, artist_statement]
