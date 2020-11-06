@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS songplays (
 
 user_table_create = ("""
 CREATE TABLE IF NOT EXISTS users (
-    user_id INT,-- PRIMARY KEY, 
+    user_id INT PRIMARY KEY, 
     first_name VARCHAR,
     last_name VARCHAR,
     gender VARCHAR,
@@ -38,8 +38,8 @@ CREATE TABLE IF NOT EXISTS users (
 
 artist_table_create = ("""
 CREATE TABLE IF NOT EXISTS artists (
-    artist_id VARCHAR,-- PRIMARY KEY, 
-    name VARCHAR, -- NOT NULL, 
+    artist_id VARCHAR PRIMARY KEY, 
+    name VARCHAR NOT NULL, 
     location VARCHAR, 
     latitude VARCHAR, 
     longitude VARCHAR
@@ -48,15 +48,14 @@ CREATE TABLE IF NOT EXISTS artists (
 
 song_table_create = ("""
 CREATE TABLE IF NOT EXISTS songs (
-    song_id VARCHAR ,--PRIMARY KEY, 
-    title VARCHAR,-- NOT NULL, 
+    song_id VARCHAR PRIMARY KEY, 
+    title VARCHAR NOT NULL, 
     artist_id VARCHAR, 
     year INTEGER, 
-    duration INTEGER
---    ,
---    CONSTRAINT fk_artist_id
---        FOREIGN KEY(artist_id) 
---        REFERENCES artists(artist_id)
+    duration INTEGER,
+    CONSTRAINT fk_artist_id
+        FOREIGN KEY(artist_id) 
+        REFERENCES artists(artist_id)
 )
 """)
 
@@ -64,7 +63,7 @@ CREATE TABLE IF NOT EXISTS songs (
 
 time_table_create = ("""
 CREATE TABLE IF NOT EXISTS time (
-    start_time TIMESTAMP ,-- PRIMARY KEY, 
+    start_time TIMESTAMP PRIMARY KEY, 
     hour INTEGER, 
     day INTEGER, 
     week INTEGER, 
@@ -82,17 +81,17 @@ songplays_statement = ("""
 
 song_statement = ("""
     PREPARE song_statement (VARCHAR, VARCHAR, VARCHAR, INT, INT) AS
-    INSERT INTO songs VALUES ($1, $2, $3, $4, $5) --ON CONFLICT DO NOTHING;
+    INSERT INTO songs VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING;
 """)
 
 artist_statement = ("""
     PREPARE artist_statement (VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR) AS
-    INSERT INTO artists VALUES ($1, $2, $3, $4, $5) -- ON CONFLICT DO NOTHING;
+    INSERT INTO artists VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING;
 """)
 
 user_statement = ("""
     PREPARE user_statement (INT, VARCHAR, VARCHAR, VARCHAR, VARCHAR) AS
-    INSERT INTO users (user_id,first_name, last_name, gender, level ) VALUES ($1, $2, $3, $4, $5) -- ON CONFLICT (user_id) DO UPDATE SET (level) = ($5);
+    INSERT INTO users (user_id,first_name, last_name, gender, level ) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (user_id) DO UPDATE SET (level) = ($5);
 """)
  
 
@@ -111,16 +110,18 @@ time_table_insert = "time"
 
 # FIND SONGS
 
-song_select = ("""
-SELECT s.song_id, a.artist_id 
-FROM songs s
-INNER JOIN artists a
-ON a.artist_id = s.artist_id
-WHERE
-    s.title = %s AND
-    a.name = %s AND
-    s.duration = %s
-""")
+song_select = ( """
+    SELECT s.song_id, a.artist_id 
+    FROM songs s
+    INNER JOIN artists a
+    ON a.artist_id = s.artist_id
+    WHERE
+        s.title = %s AND
+        a.name = %s AND
+        s.duration = ROUND(%s)
+    """)
+
+
 
 
 # QUERY LISTS
