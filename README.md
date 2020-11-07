@@ -26,5 +26,24 @@ The log files in the dataset you'll be working with are partitioned by year and 
 2. Execute **etl.py** to run the etl.
 
 
+### Output tables
 
+#### Fact Table
+ 
+**SONGPLAYS** - records in log data associated with song plays i.e. records with page NextSong
+songplay_id, start_time, user_id, level, song_id, artist_id, session_id, location, user_agent
+
+#### Dimension Tables
+
+**USERS** - users in the app
+user_id, first_name, last_name, gender, level
+
+**SONGS**  - songs in music database
+song_id, title, artist_id, year, duration
+
+**ARTISTS** - artists in music database
+artist_id, name, location, latitude, longitude
+
+**TIME** - timestamps of records in songplays broken down into specific units
+start_time, hour, day, week, month, year, weekday
 
