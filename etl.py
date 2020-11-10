@@ -79,12 +79,9 @@ def process_log_file(cur, filepath):
     
     time_df = t
 
-    # text buffer
-    s_buf = io.StringIO()
-    time_df.to_csv(s_buf)
-
-    # insert into time table
-    cur.copy_from(s_buf,time_table_insert)
+    for i, row in time_df.iterrows():
+        cur.execute(time_table_insert, row)
+       
 
     # load user table
     user_df = df[['userId',"firstName", "lastName", "gender", "level"]].drop_duplicates(subset='userId')

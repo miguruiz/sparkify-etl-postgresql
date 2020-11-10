@@ -94,6 +94,11 @@ user_statement = ("""
     PREPARE user_statement (INT, VARCHAR, VARCHAR, VARCHAR, VARCHAR) AS
     INSERT INTO users (user_id,first_name, last_name, gender, level ) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (user_id) DO UPDATE SET (level) = ($5);
 """)
+
+time_statement = ("""
+    PREPARE time_statement (TIMESTAMP, INT, INT, INT, INT, INT, INT) AS
+    INSERT INTO time VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT DO NOTHING;
+""")
  
 
 
@@ -106,7 +111,8 @@ artist_table_insert = ("EXECUTE artist_statement (%s, %s, %s, %s, %s);")
 
 user_table_insert = ("EXECUTE user_statement (%s, %s, %s, %s, %s);")
 
-time_table_insert = "time"
+time_table_insert = ("EXECUTE time_statement (%s, %s, %s, %s, %s, %s, %s);")
+
 
 
 # FIND SONGS
@@ -129,4 +135,4 @@ song_select = ( """
 
 create_table_queries = [songplay_table_create, user_table_create, artist_table_create, song_table_create, time_table_create]
 drop_table_queries = [songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
-prepared_statements = [songplays_statement, song_statement, artist_statement, user_statement]
+prepared_statements = [songplays_statement, song_statement, artist_statement, user_statement, time_statement]
