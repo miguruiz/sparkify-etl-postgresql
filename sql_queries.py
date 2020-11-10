@@ -22,13 +22,7 @@ CREATE TABLE IF NOT EXISTS songplays (
     artist_id VARCHAR, 
     session_id INT NOT NULL, 
     location VARCHAR NOT NULL, 
-    user_agent VARCHAR NOT NULL, 
-    CONSTRAINT fk_user_id
-        FOREIGN KEY(user_id) 
-        REFERENCES users(user_id),
-    CONSTRAINT fk_session_id
-        FOREIGN KEY(user_id) 
-        REFERENCES users(user_id)
+    user_agent VARCHAR NOT NULL
 )
 """)
 
