@@ -1,4 +1,4 @@
-# Sparkify ETL
+# Sparkify POSTGRESQL ETL
 
 The following project is part of UDACITY - Data Engineer Nanodegree. It consist in creating an ETL from data sources stored in JSON to a PostgreSQL database. 
 
